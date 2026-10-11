@@ -1,0 +1,254 @@
+# Autorättning för labbprovet – körs av GitHub Classroom vid varje push.
+# Samma checks som "npm run prov" lokalt. Varje check är ett kommando som ska avsluta med 0.
+# Ändra inte den här filen: rättningen görs om från lärarens kopia av grading/ efter provet.
+name: Autograding Tests
+on:
+  push:
+  repository_dispatch:
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Installera beroenden (rättningens egen installation, oberoende av din ci.yml)
+        run: npm ci
+      - name: 'A1 Workflowen är giltig (actionlint hittar inga fel)'
+        id: a1
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'A1 Workflowen är giltig (actionlint hittar inga fel)'
+          command: node grading/check.js A1
+          timeout: 5
+          max-score: 5
+      - name: 'A2 Körs på pull request och på push till main'
+        id: a2
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'A2 Körs på pull request och på push till main'
+          command: node grading/check.js A2
+          timeout: 5
+          max-score: 3
+      - name: 'A3 Koden hämtas med actions/checkout innan npm körs'
+        id: a3
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'A3 Koden hämtas med actions/checkout innan npm körs'
+          command: node grading/check.js A3
+          timeout: 5
+          max-score: 3
+      - name: 'A4 Beroenden installeras med npm ci, inte npm install'
+        id: a4
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'A4 Beroenden installeras med npm ci, inte npm install'
+          command: node grading/check.js A4
+          timeout: 5
+          max-score: 3
+      - name: 'A5 Testerna och bygget körs (npm run test:run + npm run build)'
+        id: a5
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'A5 Testerna och bygget körs (npm run test:run + npm run build)'
+          command: node grading/check.js A5
+          timeout: 5
+          max-score: 3
+      - name: 'A6 Bygget sparas som artefakt (upload-artifact med path: dist)'
+        id: a6
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'A6 Bygget sparas som artefakt (upload-artifact med path: dist)'
+          command: node grading/check.js A6
+          timeout: 5
+          max-score: 3
+      - name: 'A7 Enhetstesterna är gröna (npm run test:run, alla 18 test kvar)'
+        id: a7
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'A7 Enhetstesterna är gröna (npm run test:run, alla 18 test kvar)'
+          command: node grading/check.js A7
+          timeout: 10
+          max-score: 5
+      - name: 'B1 docker build lyckas'
+        id: b1
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'B1 docker build lyckas'
+          command: node grading/check.js B1
+          timeout: 15
+          max-score: 5
+      - name: 'B2 Containern serverar appen på port 80 (GET / ger 200 med appens HTML)'
+        id: b2
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'B2 Containern serverar appen på port 80 (GET / ger 200 med appens HTML)'
+          command: node grading/check.js B2
+          timeout: 10
+          max-score: 4
+      - name: 'B3 Omladdning på en underroute fungerar (GET /bokningar ger appen, inte 404)'
+        id: b3
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'B3 Omladdning på en underroute fungerar (GET /bokningar ger appen, inte 404)'
+          command: node grading/check.js B3
+          timeout: 10
+          max-score: 5
+      - name: 'B4 Färdiga imagen innehåller ingen Node (multi-stage)'
+        id: b4
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'B4 Färdiga imagen innehåller ingen Node (multi-stage)'
+          command: node grading/check.js B4
+          timeout: 10
+          max-score: 4
+      - name: 'B5 Imagen är under 100 MB (uppackat innehåll, docker image inspect)'
+        id: b5
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'B5 Imagen är under 100 MB (uppackat innehåll, docker image inspect)'
+          command: node grading/check.js B5
+          timeout: 10
+          max-score: 4
+      - name: 'B6 .dockerignore finns och utesluter node_modules, dist och .git'
+        id: b6
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'B6 .dockerignore finns och utesluter node_modules, dist och .git'
+          command: node grading/check.js B6
+          timeout: 5
+          max-score: 3
+      - name: 'C1 Man kan bara se sina egna bokningar (inget IDOR-hål på /api/bookings)'
+        id: c1
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'C1 Man kan bara se sina egna bokningar (inget IDOR-hål på /api/bookings)'
+          command: node grading/check.js C1
+          timeout: 5
+          max-score: 6
+      - name: 'C2 En token signerad med den gamla hemligheten avvisas (401)'
+        id: c2
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'C2 En token signerad med den gamla hemligheten avvisas (401)'
+          command: node grading/check.js C2
+          timeout: 5
+          max-score: 5
+      - name: 'C3 Hemligheten kommer bara från miljön: server utan JWT_SECRET startar inte, token signerad med miljöns JWT_SECRET godtas'
+        id: c3
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'C3 Hemligheten kommer bara från miljön: server utan JWT_SECRET startar inte, token signerad med miljöns JWT_SECRET godtas'
+          command: node grading/check.js C3
+          timeout: 5
+          max-score: 4
+      - name: 'C4 Meddelanden renderas som text – HTML i ett meddelande körs inte (ingen XSS)'
+        id: c4
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'C4 Meddelanden renderas som text – HTML i ett meddelande körs inte (ingen XSS)'
+          command: node grading/check.js C4
+          timeout: 10
+          max-score: 5
+      - name: 'C5 Token ligger inte i localStorage/sessionStorage efter inloggning, men skickas ändå med i anropen'
+        id: c5
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'C5 Token ligger inte i localStorage/sessionStorage efter inloggning, men skickas ändå med i anropen'
+          command: node grading/check.js C5
+          timeout: 10
+          max-score: 5
+      - name: 'D1 Produktionsbygget lyckas (npm run build)'
+        id: d1
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'D1 Produktionsbygget lyckas (npm run build)'
+          command: node grading/check.js D1
+          timeout: 10
+          max-score: 3
+      - name: 'D2 Ingen bild i bygget är över 300 kB'
+        id: d2
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'D2 Ingen bild i bygget är över 300 kB'
+          command: node grading/check.js D2
+          timeout: 5
+          max-score: 5
+      - name: 'D3 Vyerna laddas lazy – minst tre egna chunkar för vyer'
+        id: d3
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'D3 Vyerna laddas lazy – minst tre egna chunkar för vyer'
+          command: node grading/check.js D3
+          timeout: 5
+          max-score: 5
+      - name: 'D4 Startbundlen (index-*.js) är under 60 kB gzip'
+        id: d4
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'D4 Startbundlen (index-*.js) är under 60 kB gzip'
+          command: node grading/check.js D4
+          timeout: 5
+          max-score: 4
+      - name: 'D5 lodash är borta (inte i package.json, inte importerad i src)'
+        id: d5
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'D5 lodash är borta (inte i package.json, inte importerad i src)'
+          command: node grading/check.js D5
+          timeout: 5
+          max-score: 3
+      - name: 'D6 Chart.js registrerar bara det som ritas (ingen import av chart.js/auto)'
+        id: d6
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'D6 Chart.js registrerar bara det som ritas (ingen import av chart.js/auto)'
+          command: node grading/check.js D6
+          timeout: 5
+          max-score: 3
+      - name: 'D7 Hero-bilden har width och height (platsen reserveras, inget hopp)'
+        id: d7
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: 'D7 Hero-bilden har width och height (platsen reserveras, inget hopp)'
+          command: node grading/check.js D7
+          timeout: 5
+          max-score: 2
+      - name: Autograding Reporter
+        uses: classroom-resources/autograding-grading-reporter@v1
+        env:
+          A1_RESULTS: "${{steps.a1.outputs.result}}"
+          A2_RESULTS: "${{steps.a2.outputs.result}}"
+          A3_RESULTS: "${{steps.a3.outputs.result}}"
+          A4_RESULTS: "${{steps.a4.outputs.result}}"
+          A5_RESULTS: "${{steps.a5.outputs.result}}"
+          A6_RESULTS: "${{steps.a6.outputs.result}}"
+          A7_RESULTS: "${{steps.a7.outputs.result}}"
+          B1_RESULTS: "${{steps.b1.outputs.result}}"
+          B2_RESULTS: "${{steps.b2.outputs.result}}"
+          B3_RESULTS: "${{steps.b3.outputs.result}}"
+          B4_RESULTS: "${{steps.b4.outputs.result}}"
+          B5_RESULTS: "${{steps.b5.outputs.result}}"
+          B6_RESULTS: "${{steps.b6.outputs.result}}"
+          C1_RESULTS: "${{steps.c1.outputs.result}}"
+          C2_RESULTS: "${{steps.c2.outputs.result}}"
+          C3_RESULTS: "${{steps.c3.outputs.result}}"
+          C4_RESULTS: "${{steps.c4.outputs.result}}"
+          C5_RESULTS: "${{steps.c5.outputs.result}}"
+          D1_RESULTS: "${{steps.d1.outputs.result}}"
+          D2_RESULTS: "${{steps.d2.outputs.result}}"
+          D3_RESULTS: "${{steps.d3.outputs.result}}"
+          D4_RESULTS: "${{steps.d4.outputs.result}}"
+          D5_RESULTS: "${{steps.d5.outputs.result}}"
+          D6_RESULTS: "${{steps.d6.outputs.result}}"
+          D7_RESULTS: "${{steps.d7.outputs.result}}"
+        with:
+          runners: a1,a2,a3,a4,a5,a6,a7,b1,b2,b3,b4,b5,b6,c1,c2,c3,c4,c5,d1,d2,d3,d4,d5,d6,d7
