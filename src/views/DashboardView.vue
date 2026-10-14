@@ -1,7 +1,8 @@
 <template>
   <div>
     <h1>{{ greeting }}</h1>
-    <img src="../assets/hero.jpg" class="hero" alt="" loading="lazy">
+    <img src="../assets/hero.webp" class="hero" alt="hero image" width="1600"
+    height="900">
 
     <div class="grid">
       <div class="card">
@@ -52,5 +53,5 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.hero { width: 100%; border-radius: 10px; margin-bottom: 18px; }
+
 </style>

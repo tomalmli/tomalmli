@@ -4,10 +4,15 @@ import { createTestingPinia } from '@pinia/testing'
 import DashboardView from './DashboardView.vue'
 
 // Diagrammet ritar på en <canvas> som jsdom inte har – chart.js har egna tester, vi mockar bort det.
-vi.mock('chart.js/auto', () => ({
-  default: class ChartMock {
+vi.mock('chart.js', () => ({
+  Chart: class ChartMock {
+    static register() {}
     destroy() {}
-  }
+  },
+  BarController: class {},
+  BarElement: class {},
+  CategoryScale: class {},
+  LinearScale: class {}
 }))
 
 const renderDashboard = (initialState) =>

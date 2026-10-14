@@ -30,7 +30,6 @@ import { computed, onMounted, ref } from 'vue'
 import { useBookingsStore } from '../stores/bookings'
 import { formatDate } from '../utils/date'
 import { cancelFee, formatAmount } from '../utils/fee'
-import _ from 'lodash'
 import StatusChip from '../components/StatusChip.vue'
 
 const bookings = useBookingsStore()

@@ -4,7 +4,15 @@
 
 <script setup>
 import { onMounted, onBeforeUnmount, ref } from 'vue'
-import Chart from 'chart.js/auto'
+import {
+  BarController,
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  LinearScale
+} from 'chart.js'
+
+ChartJS.register(BarController, BarElement, CategoryScale, LinearScale)
 
 const props = defineProps({
   months: { type: Array, required: true },
@@ -15,7 +23,7 @@ const canvas = ref(null)
 let chart
 
 onMounted(() => {
-  chart = new Chart(canvas.value, {
+  chart = new ChartJS(canvas.value, {
     type: 'bar',
     data: {
       labels: props.months,

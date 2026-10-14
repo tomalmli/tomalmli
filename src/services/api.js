@@ -12,14 +12,17 @@ export class AuthError extends Error {
 }
 
 const request = async (path, options = {}) => {
+  const token = getToken()
+
   const res = await fetch(BASE_URL + path, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers
     }
   })
+
   if (res.status === 401) {
     setToken(null)
     throw new AuthError()

@@ -1,6 +1,12 @@
 name: CI
 
-on: push
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   verify:
@@ -9,10 +15,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm ci
       - uses: actions/checkout@v4
-      - run: npm run test
+      - run: npm ci
+      - run: npm run test:run
       - run: npm run build
       - uses: actions/upload-artifact@v4
         with:
           name: dist
+          path: dist
